@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+          http://www.liquibase.org/xml/ns/dbchangelog
+          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="0010-types" author="p.meyer" dbms="postgresql">
+        <sql splitStatements="false" stripComments="false"><![CDATA[
+            do $$
+            begin
+                if not exists (
+                    select 1
+                    from pg_type t
+                    join pg_namespace n on n.oid = t.typnamespace
+                    where n.nspname = 'gmdb'
+                      and t.typname = 'pub_type'
+                ) then
+                    create type gmdb.pub_type as enum ('BOOK', 'MAG');
+                end if;
+
+                if not exists (
+                    select 1
+                    from pg_type t
+                    join pg_namespace n on n.oid = t.typnamespace
+                    where n.nspname = 'gmdb'
+                      and t.typname = 'artist_type'
+                ) then
+                    create type gmdb.artist_type as enum ('PERSON', 'BAND');
+                end if;
+            end
+            $$;
+        ]]></sql>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+          http://www.liquibase.org/xml/ns/dbchangelog
+          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="0600-song" author="p.meyer" dbms="postgresql">
+        <sql splitStatements="false" stripComments="false"><![CDATA[
+            create table if not exists gmdb.song
+            (
+                id       bigint generated always as identity not null,
+                title    varchar                             not null,
+                details  jsonb                               not null,
+                album_id bigint                              null,
+                constraint pk_song primary key (id),
+                constraint uk_song_title_album unique (title, album_id),
+                constraint fk_song_album foreign key (album_id) references gmdb.album (id)
+            );
+        ]]></sql>
+    </changeSet>
+
+</databaseChangeLog>

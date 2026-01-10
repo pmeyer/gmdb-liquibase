@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+          http://www.liquibase.org/xml/ns/dbchangelog
+          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="0900-transcription_transcriber" author="p.meyer" dbms="postgresql">
+        <sql splitStatements="false" stripComments="false"><![CDATA[
+            create table if not exists gmdb.transcription_transcriber
+            (
+                transcription_id bigint not null,
+                transcriber_id   bigint not null,
+                constraint pk_transcription_transcriber primary key (transcription_id, transcriber_id),
+                constraint fk_to_transcription foreign key (transcription_id) references gmdb.transcription (id),
+                constraint fk_to_transcriber foreign key (transcriber_id) references gmdb.transcriber (id)
+            );
+        ]]></sql>
+    </changeSet>
+
+</databaseChangeLog>

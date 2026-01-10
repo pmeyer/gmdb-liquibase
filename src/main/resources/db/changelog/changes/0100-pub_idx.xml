@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+          http://www.liquibase.org/xml/ns/dbchangelog
+          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="0100-pub_idx" author="p.meyer" dbms="postgresql">
+        <sql splitStatements="false" stripComments="false"><![CDATA[
+            create table if not exists gmdb.pub_idx
+            (
+                id            bigint generated always as identity not null,
+                name          varchar                             not null,
+                type          gmdb.pub_type                       not null,
+                serial_number varchar                             null,
+                constraint pk_pub_idx primary key (id),
+                constraint uk_pub_idx_name_type unique (name, type),
+                constraint uk_serial_number unique (serial_number)
+            );
+        ]]></sql>
+    </changeSet>
+
+</databaseChangeLog>

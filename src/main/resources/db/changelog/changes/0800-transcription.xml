@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+          http://www.liquibase.org/xml/ns/dbchangelog
+          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="0800-transcription" author="p.meyer" dbms="postgresql">
+        <sql splitStatements="false" stripComments="false"><![CDATA[
+            create table if not exists gmdb.transcription
+            (
+                id          bigint generated always as identity not null,
+                song_id     bigint                              not null,
+                pub_id      bigint                              not null,
+                details     jsonb                               not null default jsonb_build_object('resourceId', gen_random_uuid()),
+                constraint pk_transcription primary key (id),
+                constraint uk_transcription_song_pub unique (song_id, pub_id),
+                constraint fk_transcription_song foreign key (song_id) references gmdb.song (id),
+                constraint fk_transcription_pub foreign key (pub_id) references gmdb.pub (id)
+            );
+        ]]></sql>
+    </changeSet>
+
+</databaseChangeLog>

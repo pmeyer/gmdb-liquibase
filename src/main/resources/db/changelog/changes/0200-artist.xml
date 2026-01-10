@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+          http://www.liquibase.org/xml/ns/dbchangelog
+          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="0200-artist" author="p.meyer" dbms="postgresql">
+        <sql splitStatements="false" stripComments="false"><![CDATA[
+            create table if not exists gmdb.artist
+            (
+                id   bigint generated always as identity not null,
+                name varchar                             not null,
+                type gmdb.artist_type                    null,
+                constraint pk_artist primary key (id),
+                constraint uk_artist_name_type unique (name, type)
+            );
+        ]]></sql>
+    </changeSet>
+
+</databaseChangeLog>

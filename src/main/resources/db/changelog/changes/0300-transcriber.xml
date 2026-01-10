@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+          http://www.liquibase.org/xml/ns/dbchangelog
+          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="0300-transcriber" author="p.meyer" dbms="postgresql">
+        <sql splitStatements="false" stripComments="false"><![CDATA[
+            create table if not exists gmdb.transcriber
+            (
+                id   bigint generated always as identity not null,
+                name varchar                             not null,
+                constraint pk_transcriber primary key (id),
+                constraint uk_transcriber_name unique (name)
+            );
+        ]]></sql>
+    </changeSet>
+
+</databaseChangeLog>
