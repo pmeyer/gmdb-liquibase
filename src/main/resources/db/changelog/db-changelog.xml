@@ -25,7 +25,6 @@
         </sql>
     </changeSet>
 
-    <!-- Put your real migrations in here -->
-    <!-- <includeAll path="changes" relativeToChangelogFile="true"/> -->
+    <includeAll path="changes" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
