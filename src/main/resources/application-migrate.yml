@@ -1,0 +1,11 @@
+spring:
+  config:
+    activate:
+      on-profile: migrate
+
+  datasource:
+    username: gmdb_admin
+    password: ${GMDB_ADMIN_PASSWORD:changeme}
+
+  liquibase:
+    change-log: classpath:db/changelog/db-changelog.xml

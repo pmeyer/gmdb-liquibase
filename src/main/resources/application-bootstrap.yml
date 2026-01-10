@@ -1,0 +1,14 @@
+spring:
+  config:
+    activate:
+      on-profile: bootstrap
+
+  datasource:
+    username: gmdbuser
+    password: ${GMDB_SUPERUSER_PASSWORD:changeme}
+
+  liquibase:
+    change-log: classpath:db/changelog/bootstrap-changelog.xml
+    parameters:
+      gmdb.app.password: ${GMDB_APP_PASSWORD:changeme}
+      gmdb.admin.password: ${GMDB_ADMIN_PASSWORD:changeme}

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+          http://www.liquibase.org/xml/ns/dbchangelog
+          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Ensure DDL runs as gmdb_owner (gmdb_admin is NOINHERIT) -->
+    <changeSet id="gmdb-main-000-set-role-owner" author="p.meyer" dbms="postgresql" runAlways="true">
+        <sql>SET ROLE gmdb_owner;</sql>
+    </changeSet>
+
+    <!-- Fail fast if SET ROLE didn't apply (prevents accidental object ownership under gmdb_admin) -->
+    <changeSet id="gmdb-main-001-assert-current-user" author="p.meyer" dbms="postgresql" runAlways="true">
+        <sql splitStatements="false" stripComments="false">
+            <![CDATA[
+            DO $$
+            BEGIN
+              IF current_user <> 'gmdb_owner' THEN
+                RAISE EXCEPTION 'Liquibase must run with SET ROLE gmdb_owner. current_user=%', current_user;
+              END IF;
+            END $$;
+            ]]>
+        </sql>
+    </changeSet>
+
+    <!-- Put your real migrations in here -->
+    <!-- <includeAll path="changes" relativeToChangelogFile="true"/> -->
+
+</databaseChangeLog>

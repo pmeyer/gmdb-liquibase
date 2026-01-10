@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://meyernas01.local:1970/gmdb
+    driver-class-name: org.postgresql.Driver
+
+  liquibase:
+    enabled: true
+    liquibase-schema: liquibase
+    default-schema: gmdb

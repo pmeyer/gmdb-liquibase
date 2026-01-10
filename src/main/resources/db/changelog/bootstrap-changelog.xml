@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+          http://www.liquibase.org/xml/ns/dbchangelog
+          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Supply these via runtime properties / liquibase.properties / env substitution -->
+    <property name="gmdb.app.password" value="CHANGE_ME_APP_USER_PASSWORD"/>
+    <property name="gmdb.admin.password" value="CHANGE_ME_ADMIN_PASSWORD"/>
+
+    <changeSet id="gmdb-bootstrap-001" author="p.meyer" dbms="postgresql">
+        <comment>
+            One-time bootstrap (run as gmdbuser).
+            Pre-req: schema "liquibase" already created manually by gmdbuser.
+            Creates roles/users, schema gmdb, permissions, and default privileges.
+        </comment>
+
+        <sql splitStatements="false" stripComments="false">
+            <![CDATA[
+            BEGIN;
+
+-- 1) Create roles + login users (idempotent)
+            DO $$
+                BEGIN
+                    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'gmdb_readonly') THEN
+                        CREATE ROLE gmdb_readonly NOLOGIN;
+                    END IF;
+
+                    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'gmdb_readwrite') THEN
+                        CREATE ROLE gmdb_readwrite NOLOGIN;
+                    END IF;
+
+                    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'gmdb_owner') THEN
+                        CREATE ROLE gmdb_owner NOLOGIN;
+                    END IF;
+
+                    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'gmdb_app_user') THEN
+                        CREATE ROLE gmdb_app_user LOGIN PASSWORD '${gmdb.app.password}';
+                    END IF;
+
+                    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'gmdb_admin') THEN
+                        CREATE ROLE gmdb_admin LOGIN PASSWORD '${gmdb.admin.password}';
+                    END IF;
+                END $$;
+
+-- 2) Lock down default public schema (recommended)
+            -- REVOKE CREATE ON SCHEMA public FROM PUBLIC;
+            -- REVOKE USAGE ON SCHEMA public FROM PUBLIC;
+
+            -- 3) Liquibase metadata schema (pre-created manually)
+-- Make gmdb_owner the owner so changelog tables live under the owner role.
+            ALTER SCHEMA liquibase OWNER TO gmdb_owner;
+
+-- Optional hardening: keep general users out of liquibase schema
+            REVOKE ALL ON SCHEMA liquibase FROM PUBLIC;
+            REVOKE ALL ON SCHEMA liquibase FROM gmdb_readonly;
+            REVOKE ALL ON SCHEMA liquibase FROM gmdb_readwrite;
+            GRANT  USAGE ON SCHEMA liquibase TO gmdb_owner;
+            GRANT  CREATE ON SCHEMA liquibase TO gmdb_owner;
+
+-- 4) Create application schema owned by gmdb_owner
+            CREATE SCHEMA IF NOT EXISTS gmdb AUTHORIZATION gmdb_owner;
+            ALTER SCHEMA gmdb OWNER TO gmdb_owner;
+
+-- 5) Database-level access
+            GRANT CONNECT ON DATABASE gmdb TO gmdb_app_user;
+            GRANT CONNECT ON DATABASE gmdb TO gmdb_admin;
+
+-- 6) Role memberships
+            GRANT gmdb_readwrite TO gmdb_app_user;
+            GRANT gmdb_owner TO gmdb_admin;
+
+-- Hardening: require explicit SET ROLE for owner privileges
+            ALTER ROLE gmdb_admin NOINHERIT;
+
+-- 7) Schema-level privileges
+            GRANT USAGE ON SCHEMA gmdb TO gmdb_readonly;
+            GRANT USAGE ON SCHEMA gmdb TO gmdb_readwrite;
+
+            REVOKE CREATE ON SCHEMA gmdb FROM PUBLIC;
+            REVOKE CREATE ON SCHEMA gmdb FROM gmdb_readonly;
+            REVOKE CREATE ON SCHEMA gmdb FROM gmdb_readwrite;
+            GRANT  CREATE ON SCHEMA gmdb TO gmdb_owner;
+
+-- 8) Grants on existing objects (safe even if schema is empty)
+            GRANT SELECT ON ALL TABLES IN SCHEMA gmdb TO gmdb_readonly;
+            GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA gmdb TO gmdb_readwrite;
+
+            GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA gmdb TO gmdb_readonly;
+            GRANT USAGE, SELECT, UPDATE ON ALL SEQUENCES IN SCHEMA gmdb TO gmdb_readwrite;
+
+            GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA gmdb TO gmdb_readonly;
+            GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA gmdb TO gmdb_readwrite;
+
+-- 9) Default privileges for future objects created as gmdb_owner in schema gmdb
+            ALTER DEFAULT PRIVILEGES FOR ROLE gmdb_owner IN SCHEMA gmdb
+                GRANT SELECT ON TABLES TO gmdb_readonly;
+
+            ALTER DEFAULT PRIVILEGES FOR ROLE gmdb_owner IN SCHEMA gmdb
+                GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO gmdb_readwrite;
+
+            ALTER DEFAULT PRIVILEGES FOR ROLE gmdb_owner IN SCHEMA gmdb
+                GRANT USAGE, SELECT ON SEQUENCES TO gmdb_readonly;
+
+            ALTER DEFAULT PRIVILEGES FOR ROLE gmdb_owner IN SCHEMA gmdb
+                GRANT USAGE, SELECT, UPDATE ON SEQUENCES TO gmdb_readwrite;
+
+            ALTER DEFAULT PRIVILEGES FOR ROLE gmdb_owner IN SCHEMA gmdb
+                GRANT EXECUTE ON FUNCTIONS TO gmdb_readonly;
+
+            ALTER DEFAULT PRIVILEGES FOR ROLE gmdb_owner IN SCHEMA gmdb
+                GRANT EXECUTE ON FUNCTIONS TO gmdb_readwrite;
+
+-- 10) Default search_path
+            ALTER ROLE gmdb_app_user SET search_path = gmdb, public;
+            ALTER ROLE gmdb_admin    SET search_path = gmdb, public;
+
+            COMMIT;
+            ]]>
+        </sql>
+    </changeSet>
+
+    <changeSet id="gmdb-bootstrap-002-liquibase-metadata-ownership" author="p.meyer" dbms="postgresql">
+        <comment>
+            Set ownership/permissions on Liquibase metadata tables created during bootstrap when Liquibase ran as gmdbuser.
+            Liquibase (running later as gmdb_admin) must be able to read/update these tables BEFORE any changeSets execute.
+        </comment>
+
+        <sql splitStatements="false" stripComments="false">
+            <![CDATA[
+            -- Ensure gmdb_admin can access the Liquibase schema
+            GRANT USAGE ON SCHEMA liquibase TO gmdb_admin;
+
+            -- Align ownership with the intended owner role
+            ALTER TABLE IF EXISTS liquibase.databasechangelog     OWNER TO gmdb_owner;
+            ALTER TABLE IF EXISTS liquibase.databasechangeloglock OWNER TO gmdb_owner;
+
+            -- Allow gmdb_admin to use Liquibase tracking tables (read, lock/unlock, write)
+            GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE liquibase.databasechangelog     TO gmdb_admin;
+            GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE liquibase.databasechangeloglock TO gmdb_admin;
+            ]]>
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
