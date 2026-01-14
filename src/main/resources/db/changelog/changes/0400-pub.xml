@@ -12,10 +12,30 @@
                 id          bigint generated always as identity not null,
                 pub_date    date                                null,
                 pub_idx_id  bigint                              not null,
-                details     jsonb                               not null default jsonb_build_object('resourceId', gen_random_uuid()),
+                details     jsonb                               not null,
                 constraint pk_pub primary key (id),
                 constraint fk_pub_pub_idx foreign key (pub_idx_id) references gmdb.pub_idx (id)
             );
+        ]]></sql>
+    </changeSet>
+
+    <changeSet id="0400-pub-immutable-resource-id" author="p.meyer" dbms="postgresql">
+        <sql splitStatements="false" stripComments="false"><![CDATA[
+            drop trigger if exists trg_pub_enforce_resource_id_immutable on gmdb.pub;
+            create trigger trg_pub_enforce_resource_id_immutable
+                before update of details on gmdb.pub
+                for each row
+                execute function gmdb.details_enforce_resource_id_immutable();
+        ]]></sql>
+    </changeSet>
+
+    <changeSet id="0400-pub-default-resource-id" author="p.meyer" dbms="postgresql">
+        <sql splitStatements="false" stripComments="false"><![CDATA[
+            drop trigger if exists trg_pub_default_resource_id on gmdb.pub;
+            create trigger trg_pub_default_resource_id
+                before insert on gmdb.pub
+                for each row
+                execute function gmdb.details_default_resource_id();
         ]]></sql>
     </changeSet>
 </databaseChangeLog>

@@ -12,12 +12,32 @@
                 id          bigint generated always as identity not null,
                 song_id     bigint                              not null,
                 pub_id      bigint                              not null,
-                details     jsonb                               not null default jsonb_build_object('resourceId', gen_random_uuid()),
+                details     jsonb                               not null,
                 constraint pk_transcription primary key (id),
                 constraint uk_transcription_song_pub unique (song_id, pub_id),
                 constraint fk_transcription_song foreign key (song_id) references gmdb.song (id),
                 constraint fk_transcription_pub foreign key (pub_id) references gmdb.pub (id)
             );
+        ]]></sql>
+    </changeSet>
+
+    <changeSet id="0800-transcription-immutable-resource-id" author="p.meyer" dbms="postgresql">
+        <sql splitStatements="false" stripComments="false"><![CDATA[
+            drop trigger if exists trg_transcription_enforce_resource_id_immutable on gmdb.transcription;
+            create trigger trg_transcription_enforce_resource_id_immutable
+                before update of details on gmdb.transcription
+                for each row
+                execute function gmdb.details_enforce_resource_id_immutable();
+        ]]></sql>
+    </changeSet>
+
+    <changeSet id="0800-transcription-default-resource-id" author="p.meyer" dbms="postgresql">
+        <sql splitStatements="false" stripComments="false"><![CDATA[
+            drop trigger if exists trg_transcription_default_resource_id on gmdb.transcription;
+            create trigger trg_transcription_default_resource_id
+                before insert on gmdb.transcription
+                for each row
+                execute function gmdb.details_default_resource_id();
         ]]></sql>
     </changeSet>
 

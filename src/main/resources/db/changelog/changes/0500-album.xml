@@ -11,12 +11,32 @@
             (
                 id                bigint generated always as identity not null,
                 title             varchar                             not null,
-                details           jsonb                               not null default jsonb_build_object('resourceId', gen_random_uuid()),
+                details           jsonb                               not null,
                 primary_artist_id bigint                              null,
                 constraint pk_album primary key (id),
                 constraint fk_album_artist foreign key (primary_artist_id) references gmdb.artist (id),
                 constraint uk_album_title_details_artist unique (title, details, primary_artist_id)
             );
+        ]]></sql>
+    </changeSet>
+
+    <changeSet id="0500-album-immutable-resource-id" author="p.meyer" dbms="postgresql">
+        <sql splitStatements="false" stripComments="false"><![CDATA[
+            drop trigger if exists trg_album_enforce_resource_id_immutable on gmdb.album;
+            create trigger trg_album_enforce_resource_id_immutable
+                before update of details on gmdb.album
+                for each row
+                execute function gmdb.details_enforce_resource_id_immutable();
+        ]]></sql>
+    </changeSet>
+
+    <changeSet id="0500-album-default-resource-id" author="p.meyer" dbms="postgresql">
+        <sql splitStatements="false" stripComments="false"><![CDATA[
+            drop trigger if exists trg_album_default_resource_id on gmdb.album;
+            create trigger trg_album_default_resource_id
+                before insert on gmdb.album
+                for each row
+                execute function gmdb.details_default_resource_id();
         ]]></sql>
     </changeSet>
 
