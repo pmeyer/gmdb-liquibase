@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+          http://www.liquibase.org/xml/ns/dbchangelog
+          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="1000-gmdb-merge-details" author="p.meyer" dbms="postgresql">
+        <sql splitStatements="false" stripComments="false"><![CDATA[
+            create or replace function gmdb.merge_details(dest jsonb, source jsonb)
+                returns jsonb
+                language plpgsql
+                immutable
+            as $$
+            declare mergedResources jsonb;
+            begin
+                mergedResources := coalesce(dest->'resources', '{}'::jsonb) ||
+                                   coalesce(source->'resources', '{}'::jsonb);
+
+                return  coalesce(dest - 'resources', '{}'::jsonb) ||
+                        coalesce(source - 'resources', '{}'::jsonb) ||
+                        case
+                            when mergedResources = '{}'::jsonb then '{}'::jsonb
+                            else jsonb_build_object('resources', mergedResources)
+                        end;
+            end;
+            $$;
+            ]]></sql>
+    </changeSet>
+</databaseChangeLog>
