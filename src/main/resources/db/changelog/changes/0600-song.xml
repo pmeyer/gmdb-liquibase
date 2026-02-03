@@ -20,4 +20,24 @@
         ]]></sql>
     </changeSet>
 
+    <changeSet id="0600-song-immutable-resource-id" author="p.meyer" dbms="postgresql">
+        <sql splitStatements="false" stripComments="false"><![CDATA[
+            drop trigger if exists trg_song_enforce_resource_id_immutable on gmdb.song;
+            create trigger trg_song_enforce_resource_id_immutable
+                before update of details on gmdb.song
+                for each row
+            execute function gmdb.details_enforce_resource_id_immutable();
+            ]]></sql>
+    </changeSet>
+
+    <changeSet id="0600-song-default-resource-id" author="p.meyer" dbms="postgresql">
+        <sql splitStatements="false" stripComments="false"><![CDATA[
+            drop trigger if exists trg_song_default_resource_id on gmdb.song;
+            create trigger trg_song_default_resource_id
+                before insert on gmdb.song
+                for each row
+            execute function gmdb.details_default_resource_id();
+            ]]></sql>
+    </changeSet>
+
 </databaseChangeLog>
