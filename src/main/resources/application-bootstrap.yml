@@ -4,7 +4,7 @@ spring:
       on-profile: bootstrap
 
   datasource:
-    username: skidrows_sa
+    username: ${GMDB_SUPERUSER:changeme}
     password: ${GMDB_SUPERUSER_PASSWORD:changeme}
 
   liquibase:

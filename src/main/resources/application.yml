@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://meyernas01.local:1970/gmdb
+    url: jdbc:postgresql://${PGSQL_HOST}:${PGSQL_PORT:5432}/gmdb
     driver-class-name: org.postgresql.Driver
 
   liquibase:
