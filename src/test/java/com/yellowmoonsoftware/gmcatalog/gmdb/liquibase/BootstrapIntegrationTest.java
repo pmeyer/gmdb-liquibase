@@ -2,9 +2,7 @@ package com.yellowmoonsoftware.gmcatalog.gmdb.liquibase;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.nio.file.Path;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Map;
 
@@ -18,32 +16,10 @@ import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.images.builder.ImageFromDockerfile;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
-@Testcontainers
 @SpringBootTest
 @ActiveProfiles("bootstrap")
-class BootstrapIntegrationTest {
-    private static final int POSTGRES_PORT = 5432;
-    private static final String DATABASE_NAME = "gmdb";
-    private static final String SUPERUSER = "gmdb_test_superuser";
-    private static final String SUPERUSER_PASSWORD = "gmdb-test-superuser-password";
-    private static final String ADMIN_PASSWORD = "gmdb-test-admin-password";
-    private static final String APP_PASSWORD = "gmdb-test-app-password";
-
-    @Container
-    static final GenericContainer<?> postgres = new GenericContainer<>(
-            new ImageFromDockerfile().withFileFromPath(".", Path.of("docker")))
-            .withEnv("POSTGRES_DB", DATABASE_NAME)
-            .withEnv("POSTGRES_USER", SUPERUSER)
-            .withEnv("POSTGRES_PASSWORD", SUPERUSER_PASSWORD)
-            .withExposedPorts(POSTGRES_PORT)
-            .waitingFor(Wait.forListeningPort());
-
+class BootstrapIntegrationTest extends AbstractDatabaseIntegrationTest {
     @DynamicPropertySource
     static void configureBootstrapProperties(final DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", BootstrapIntegrationTest::jdbcUrl);
@@ -111,15 +87,6 @@ class BootstrapIntegrationTest {
             assertThat(hasSchemaPrivilege(appJdbc, "gmdb_app_user", "liquibase", "USAGE")).isFalse();
             assertThat(canSetRole(adminJdbc, "gmdb_owner")).isTrue();
         }
-    }
-
-    private static String jdbcUrl() {
-        return "jdbc:postgresql://" + postgres.getHost() + ":" + postgres.getMappedPort(POSTGRES_PORT) + "/"
-                + DATABASE_NAME;
-    }
-
-    private static Connection connection(final String username, final String password) throws SQLException {
-        return DriverManager.getConnection(jdbcUrl(), username, password);
     }
 
     private static String schemaOwner(final JdbcTemplate jdbc, final String schema) {
