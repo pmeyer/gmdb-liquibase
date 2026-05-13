@@ -103,3 +103,21 @@ mvn spring-boot:run -Dspring-boot.run.profiles=migrate
 
 
 If not set, the application uses the default placeholder `changeme` which will likely cause quick failure!
+
+## Releases
+Releases are managed by release-please from conventional commits on `main`. The Maven project remains on a
+`-SNAPSHOT` development version between releases.
+
+When release-please creates a GitHub release, it also creates the corresponding Git tag. GitHub Actions then checks out
+that release tag and publishes the non-snapshot Maven artifact to GitHub Packages:
+
+```xml
+<dependency>
+  <groupId>com.yellowmoonsoftware.gmcatalog</groupId>
+  <artifactId>gmdb-liquibase</artifactId>
+  <version>1.0.0</version> <!-- x-release-please-version -->
+</dependency>
+```
+
+Snapshot versions may be built locally, but they are not published by the release workflow. The workflow verifies that
+the Maven project version does not end in `-SNAPSHOT` before running `mvn deploy`.
