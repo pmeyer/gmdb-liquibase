@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/pmeyer/gmdb-liquibase/compare/gmdb-liquibase-v1.0.0...gmdb-liquibase-v1.0.1) (2026-05-13)
+
+
+### Bug Fixes
+
+* verify pg_jsonschema package checksum ([1383c67](https://github.com/pmeyer/gmdb-liquibase/commit/1383c673e24bffc0993d15cfb82d4f7b33e2d61f))
+
 ## 1.0.0 (2026-05-13)
 
 
