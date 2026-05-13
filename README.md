@@ -104,6 +104,28 @@ mvn spring-boot:run -Dspring-boot.run.profiles=migrate
 
 If not set, the application uses the default placeholder `changeme` which will likely cause quick failure!
 
+## Integration Tests
+Integration tests use [Testcontainers](https://testcontainers.com/) to run PostgreSQL from the same
+[Dockerfile](docker/Dockerfile) used for local database development.
+
+The test container sets `POSTGRES_DB=gmdb`, along with a generated PostgreSQL superuser and password, so the database
+name and initialization behavior match the assumptions used by the Spring Boot + Liquibase profiles. The current
+bootstrap integration tests start the application with the `bootstrap` profile and verify the structures created by
+`bootstrap-changelog.xml`, including schemas, roles, role memberships, Liquibase metadata tables, and access for the
+migration user.
+
+Run the integration tests with Docker running:
+
+```sh
+mvn test
+```
+
+The full Maven verification lifecycle also runs these tests:
+
+```sh
+mvn verify
+```
+
 ## Releases
 Releases are managed by release-please from conventional commits on `main`. The Maven project remains on a
 `-SNAPSHOT` development version between releases.
