@@ -115,7 +115,7 @@ that release tag and publishes the non-snapshot Maven artifact to GitHub Package
 <dependency>
   <groupId>com.yellowmoonsoftware.gmcatalog</groupId>
   <artifactId>gmdb-liquibase</artifactId>
-  <version>1.0.1-SNAPSHOT</version> <!-- x-release-please-version -->
+  <version>1.0.1</version> <!-- x-release-please-version -->
 </dependency>
 ```
 
