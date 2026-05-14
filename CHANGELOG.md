@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/pmeyer/gmdb-liquibase/compare/gmdb-liquibase-v1.1.0...gmdb-liquibase-v1.2.0) (2026-05-14)
+
+
+### Features
+
+* publish resources classifier artifact ([e1ebc2a](https://github.com/pmeyer/gmdb-liquibase/commit/e1ebc2a8c4980e150121cb5717ced72075c6f30e))
+
 ## [1.1.0](https://github.com/pmeyer/gmdb-liquibase/compare/gmdb-liquibase-v1.0.2...gmdb-liquibase-v1.1.0) (2026-05-14)
 
 
