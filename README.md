@@ -19,11 +19,29 @@ two initialization scripts are pulled into the image that:
 Initialization scripts are executed the first time the container and database is started.  See official
 [PostgreSQL docs](https://hub.docker.com/_/postgres#initialization-scripts) for more info.
 
-## Embedded Docker Build Context
-The Maven artifact embeds the Docker build context as classpath resources under `gmdb-liquibase/docker/`.
-Referencing applications can depend on this jar and extract the following resources when they need to build the database
-image:
+## Resources Artifact
+The Maven build publishes an attached `resources` classifier artifact for integration-test and runtime consumers that
+need the Liquibase changelogs, profile configuration, and Docker build context without depending on the executable
+Spring Boot jar:
 
+```xml
+<dependency>
+  <groupId>com.yellowmoonsoftware.gmcatalog</groupId>
+  <artifactId>gmdb-liquibase</artifactId>
+  <version>1.1.1-SNAPSHOT</version> <!-- x-release-please-version -->
+  <classifier>resources</classifier>
+  <scope>test</scope>
+</dependency>
+```
+
+The classifier jar exposes the following paths at normal classpath roots:
+
+- `application.yml`
+- `application-bootstrap.yml`
+- `application-migrate.yml`
+- `db/changelog/bootstrap-changelog.xml`
+- `db/changelog/db-changelog.xml`
+- `db/changelog/changes/...`
 - `gmdb-liquibase/docker/Dockerfile`
 - `gmdb-liquibase/docker/docker-entrypoint-initdb.d/000_enable_pg_jsonschema.sql`
 - `gmdb-liquibase/docker/docker-entrypoint-initdb.d/010_create_liquibase_schema.sql`

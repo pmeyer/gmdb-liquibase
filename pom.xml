@@ -96,15 +96,83 @@
                     <exclude>**/.DS_Store</exclude>
                 </excludes>
             </resource>
-            <resource>
-                <directory>docker</directory>
-                <targetPath>gmdb-liquibase/docker</targetPath>
-                <excludes>
-                    <exclude>**/.DS_Store</exclude>
-                </excludes>
-            </resource>
         </resources>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>clean-resources-classifier-content</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                        <configuration>
+                            <excludeDefaultDirectories>true</excludeDefaultDirectories>
+                            <filesets>
+                                <fileset>
+                                    <directory>${project.build.directory}/resources-classifier</directory>
+                                </fileset>
+                            </filesets>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-resources-classifier-content</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/resources-classifier</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources</directory>
+                                    <includes>
+                                        <include>application.yml</include>
+                                        <include>application-bootstrap.yml</include>
+                                        <include>application-migrate.yml</include>
+                                        <include>db/changelog/**</include>
+                                    </includes>
+                                    <excludes>
+                                        <exclude>**/.DS_Store</exclude>
+                                    </excludes>
+                                </resource>
+                                <resource>
+                                    <directory>docker</directory>
+                                    <targetPath>gmdb-liquibase/docker</targetPath>
+                                    <excludes>
+                                        <exclude>**/.DS_Store</exclude>
+                                    </excludes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>resources-classifier-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>resources</classifier>
+                            <classesDirectory>${project.build.directory}/resources-classifier</classesDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
