@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.0](https://github.com/pmeyer/gmdb-liquibase/compare/gmdb-liquibase-v1.0.2...gmdb-liquibase-v1.1.0) (2026-05-14)
+
+
+### Features
+
+* embed docker build context resources ([b9ba0df](https://github.com/pmeyer/gmdb-liquibase/commit/b9ba0dfc2f5fef5f073bcaf0368c9073edbf5758))
+* embed docker build context resources ([2a0f85b](https://github.com/pmeyer/gmdb-liquibase/commit/2a0f85baa1bbe6377119053537d349038150dde2))
+
 ## [1.0.2](https://github.com/pmeyer/gmdb-liquibase/compare/gmdb-liquibase-v1.0.1...gmdb-liquibase-v1.0.2) (2026-05-14)
 
 
