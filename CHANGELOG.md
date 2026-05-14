@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.2](https://github.com/pmeyer/gmdb-liquibase/compare/gmdb-liquibase-v1.0.1...gmdb-liquibase-v1.0.2) (2026-05-14)
+
+
+### Bug Fixes
+
+* reject null details resource ids ([ec864e1](https://github.com/pmeyer/gmdb-liquibase/commit/ec864e13923f6b67531f31f1b21fefba99c07b66))
+* reject null details resource ids ([1a97d56](https://github.com/pmeyer/gmdb-liquibase/commit/1a97d569f68b0779bd5fa155d0f76f034df2a3fa))
+
 ## [1.0.1](https://github.com/pmeyer/gmdb-liquibase/compare/gmdb-liquibase-v1.0.0...gmdb-liquibase-v1.0.1) (2026-05-13)
 
 
