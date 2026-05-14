@@ -35,4 +35,25 @@
             $$;
             ]]></sql>
     </changeSet>
+
+    <changeSet id="0015-details-resource-id-default-reject-null" author="p.meyer" dbms="postgresql">
+        <sql splitStatements="false" stripComments="false"><![CDATA[
+            create or replace function gmdb.details_default_resource_id()
+                returns trigger
+                language plpgsql
+            as $$
+            begin
+                if new.details is not null
+                    and new.details ? 'resourceId'
+                    and jsonb_typeof(new.details->'resourceId') = 'null' then
+                    raise exception '%.details->resourceId must not be null', tg_table_name;
+                end if;
+
+                new.details := jsonb_build_object('resourceId', gen_random_uuid())
+                    || coalesce(new.details, '{}'::jsonb);
+                return new;
+            end;
+            $$;
+            ]]></sql>
+    </changeSet>
 </databaseChangeLog>

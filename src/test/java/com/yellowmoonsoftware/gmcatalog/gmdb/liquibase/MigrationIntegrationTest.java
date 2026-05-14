@@ -14,6 +14,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
+@SuppressWarnings("SqlSourceToSinkFlow")
 class MigrationIntegrationTest extends AbstractDatabaseIntegrationTest {
     private static JdbcTemplate jdbc;
 
@@ -94,6 +95,17 @@ class MigrationIntegrationTest extends AbstractDatabaseIntegrationTest {
 
             assertThat(resourceId(table, id)).isEqualTo(resourceId);
             assertThat(textDetailProperty(table, id, "source")).isEqualTo("manual");
+        }
+    }
+
+    @Test
+    void detailsDefaultResourceIdTriggersRejectNullResourceIdsOnInsert() {
+        for (final DetailTable table : detailTables()) {
+            assertThatThrownBy(() -> table.insertWithDetails("""
+                    {"resourceId":null,"source":"manual"}
+                    """))
+                    .isInstanceOf(DataAccessException.class)
+                    .hasMessageContaining("details->resourceId must not be null");
         }
     }
 
