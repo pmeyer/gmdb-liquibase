@@ -19,6 +19,15 @@ two initialization scripts are pulled into the image that:
 Initialization scripts are executed the first time the container and database is started.  See official
 [PostgreSQL docs](https://hub.docker.com/_/postgres#initialization-scripts) for more info.
 
+## Embedded Docker Build Context
+The Maven artifact embeds the Docker build context as classpath resources under `gmdb-liquibase/docker/`.
+Referencing applications can depend on this jar and extract the following resources when they need to build the database
+image:
+
+- `gmdb-liquibase/docker/Dockerfile`
+- `gmdb-liquibase/docker/docker-entrypoint-initdb.d/000_enable_pg_jsonschema.sql`
+- `gmdb-liquibase/docker/docker-entrypoint-initdb.d/010_create_liquibase_schema.sql`
+
 ## Initialization
 Get the database container up and running.  Refer to the docker image documentation for details about storage of the
 database data files, the database name, the superuser name and password (you'll need these later). 

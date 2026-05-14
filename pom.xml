@@ -89,6 +89,21 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>**/.DS_Store</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <directory>docker</directory>
+                <targetPath>gmdb-liquibase/docker</targetPath>
+                <excludes>
+                    <exclude>**/.DS_Store</exclude>
+                </excludes>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
