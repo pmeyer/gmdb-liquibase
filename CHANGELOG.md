@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/pmeyer/gmdb-liquibase/compare/gmdb-liquibase-v1.2.0...gmdb-liquibase-v1.3.0) (2026-05-27)
+
+
+### Features
+
+* publish liquibase app container image ([7ea2302](https://github.com/pmeyer/gmdb-liquibase/commit/7ea2302d6dddd370bce60e438eaaef90fda9a424))
+
 ## [1.2.0](https://github.com/pmeyer/gmdb-liquibase/compare/gmdb-liquibase-v1.1.0...gmdb-liquibase-v1.2.0) (2026-05-14)
 
 
