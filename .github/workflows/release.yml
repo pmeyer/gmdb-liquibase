@@ -55,8 +55,10 @@ jobs:
         id: release-version
         run: |
           version="$(mvn -B -q -DforceStdout help:evaluate -Dexpression=project.version)"
+          major_minor="${version%.*}"
           echo "Publishing ${version} from ${{ needs.release-please.outputs.tag_name }}"
           echo "version=${version}" >> "${GITHUB_OUTPUT}"
+          echo "major-minor-version=${major_minor}" >> "${GITHUB_OUTPUT}"
           case "${version}" in
             *-SNAPSHOT)
               echo "::error::Snapshot versions are not published"
@@ -85,8 +87,8 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository_owner }}/gmdb-liquibase
           tags: |
-            type=semver,pattern={{version}},value=${{ needs.release-please.outputs.tag_name }}
-            type=semver,pattern={{major}}.{{minor}},value=${{ needs.release-please.outputs.tag_name }}
+            type=raw,value=${{ steps.release-version.outputs.version }}
+            type=raw,value=${{ steps.release-version.outputs.major-minor-version }}
             type=raw,value=latest
           labels: |
             org.opencontainers.image.title=gmdb-liquibase
