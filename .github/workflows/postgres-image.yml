@@ -25,8 +25,19 @@ jobs:
       - name: Extract image versions
         id: versions
         run: |
+          image_version="$(tr -d '[:space:]' < docker/postgres/VERSION)"
           postgres_version="$(sed -n 's/^FROM postgres:\([0-9.]*\).*/\1/p' docker/postgres/Dockerfile)"
           pg_jsonschema_version="$(sed -n 's/^ARG PG_JSONSCHEMA_VERSION=\(.*\)$/\1/p' docker/postgres/Dockerfile)"
+
+          if [ -z "${image_version}" ]; then
+            echo "::error::Unable to determine image version from docker/postgres/VERSION"
+            exit 1
+          fi
+
+          if ! echo "${image_version}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::Image version must be a semantic version like 1.0.0"
+            exit 1
+          fi
 
           if [ -z "${postgres_version}" ]; then
             echo "::error::Unable to determine PostgreSQL version from docker/postgres/Dockerfile"
@@ -38,8 +49,8 @@ jobs:
             exit 1
           fi
 
+          echo "image-version=${image_version}" >> "${GITHUB_OUTPUT}"
           echo "postgres-version=${postgres_version}" >> "${GITHUB_OUTPUT}"
-          echo "postgres-major-version=${postgres_version%%.*}" >> "${GITHUB_OUTPUT}"
           echo "pg-jsonschema-version=${pg_jsonschema_version}" >> "${GITHUB_OUTPUT}"
 
       - name: Log in to GitHub Container Registry
@@ -58,14 +69,15 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository_owner }}/gmdb-postgres-jsonschema
           tags: |
-            type=raw,value=${{ steps.versions.outputs.postgres-version }}
-            type=raw,value=${{ steps.versions.outputs.postgres-major-version }}
-            type=raw,value=${{ steps.versions.outputs.postgres-version }}-pgjsonschema-${{ steps.versions.outputs.pg-jsonschema-version }}
+            type=raw,value=${{ steps.versions.outputs.image-version }}
+            type=raw,value=latest
             type=sha,prefix=sha-
           labels: |
             org.opencontainers.image.title=gmdb-postgres-jsonschema
             org.opencontainers.image.description=PostgreSQL with pg_jsonschema and GMDB initialization scripts
-            org.opencontainers.image.version=${{ steps.versions.outputs.postgres-version }}-pgjsonschema-${{ steps.versions.outputs.pg-jsonschema-version }}
+            org.opencontainers.image.version=${{ steps.versions.outputs.image-version }}
+            org.opencontainers.image.base.name=postgres:${{ steps.versions.outputs.postgres-version }}
+            org.opencontainers.image.pg-jsonschema.version=${{ steps.versions.outputs.pg-jsonschema-version }}
 
       - name: Build and publish Postgres image
         uses: docker/build-push-action@v6
