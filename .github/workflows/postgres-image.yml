@@ -1,0 +1,75 @@
+name: Postgres Image
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docker/postgres/**'
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    name: Publish Postgres Image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Extract image versions
+        id: versions
+        run: |
+          postgres_version="$(sed -n 's/^FROM postgres:\([0-9.]*\).*/\1/p' docker/postgres/Dockerfile)"
+          pg_jsonschema_version="$(sed -n 's/^ARG PG_JSONSCHEMA_VERSION=\(.*\)$/\1/p' docker/postgres/Dockerfile)"
+
+          if [ -z "${postgres_version}" ]; then
+            echo "::error::Unable to determine PostgreSQL version from docker/postgres/Dockerfile"
+            exit 1
+          fi
+
+          if [ -z "${pg_jsonschema_version}" ]; then
+            echo "::error::Unable to determine pg_jsonschema version from docker/postgres/Dockerfile"
+            exit 1
+          fi
+
+          echo "postgres-version=${postgres_version}" >> "${GITHUB_OUTPUT}"
+          echo "postgres-major-version=${postgres_version%%.*}" >> "${GITHUB_OUTPUT}"
+          echo "pg-jsonschema-version=${pg_jsonschema_version}" >> "${GITHUB_OUTPUT}"
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract image metadata
+        id: postgres-meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/gmdb-postgres-jsonschema
+          tags: |
+            type=raw,value=${{ steps.versions.outputs.postgres-version }}
+            type=raw,value=${{ steps.versions.outputs.postgres-major-version }}
+            type=raw,value=${{ steps.versions.outputs.postgres-version }}-pgjsonschema-${{ steps.versions.outputs.pg-jsonschema-version }}
+            type=sha,prefix=sha-
+          labels: |
+            org.opencontainers.image.title=gmdb-postgres-jsonschema
+            org.opencontainers.image.description=PostgreSQL with pg_jsonschema and GMDB initialization scripts
+            org.opencontainers.image.version=${{ steps.versions.outputs.postgres-version }}-pgjsonschema-${{ steps.versions.outputs.pg-jsonschema-version }}
+
+      - name: Build and publish Postgres image
+        uses: docker/build-push-action@v6
+        with:
+          context: docker/postgres
+          file: docker/postgres/Dockerfile
+          push: true
+          tags: ${{ steps.postgres-meta.outputs.tags }}
+          labels: ${{ steps.postgres-meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

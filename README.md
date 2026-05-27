@@ -206,5 +206,9 @@ The same release workflow also builds and publishes the application container im
 The image is assembled from the release jar produced by the Maven deploy step. Release images are tagged with the full
 version, the major/minor version, and `latest`.
 
+The Postgres image from [docker/postgres/Dockerfile](docker/postgres/Dockerfile) is published separately as
+`ghcr.io/pmeyer/gmdb-postgres-jsonschema` when files under `docker/postgres` change on `main`, or when the workflow is
+run manually. It is tagged with the PostgreSQL version, PostgreSQL major version, pg_jsonschema version, and commit SHA.
+
 Snapshot versions may be built locally, but they are not published by the release workflow. The workflow verifies that
 the Maven project version does not end in `-SNAPSHOT` before publishing Maven artifacts or container images.
