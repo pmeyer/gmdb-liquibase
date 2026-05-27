@@ -29,7 +29,7 @@ jobs:
           manifest-file: .release-please-manifest.json
 
   publish:
-    name: Publish GitHub Package
+    name: Publish GitHub Packages
     needs: release-please
     if: ${{ needs.release-please.outputs.release_created == 'true' }}
     runs-on: ubuntu-latest
@@ -52,9 +52,11 @@ jobs:
           server-id: github
 
       - name: Verify release version
+        id: release-version
         run: |
           version="$(mvn -B -q -DforceStdout help:evaluate -Dexpression=project.version)"
           echo "Publishing ${version} from ${{ needs.release-please.outputs.tag_name }}"
+          echo "version=${version}" >> "${GITHUB_OUTPUT}"
           case "${version}" in
             *-SNAPSHOT)
               echo "::error::Snapshot versions are not published"
@@ -66,3 +68,37 @@ jobs:
         run: mvn -B -DskipTests deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract application image metadata
+        id: app-meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/gmdb-liquibase
+          tags: |
+            type=semver,pattern={{version}},value=${{ needs.release-please.outputs.tag_name }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ needs.release-please.outputs.tag_name }}
+            type=raw,value=latest
+          labels: |
+            org.opencontainers.image.title=gmdb-liquibase
+            org.opencontainers.image.description=Spring Boot Liquibase migrations for the Guitar Transcription Catalog database
+            org.opencontainers.image.version=${{ steps.release-version.outputs.version }}
+
+      - name: Build and publish application image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/app/Dockerfile
+          push: true
+          build-args: |
+            JAR_FILE=target/gmdb-liquibase-${{ steps.release-version.outputs.version }}.jar
+          tags: ${{ steps.app-meta.outputs.tags }}
+          labels: ${{ steps.app-meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

@@ -23,7 +23,7 @@ abstract class AbstractDatabaseIntegrationTest {
 
     @Container
     static final GenericContainer<?> postgres = new GenericContainer<>(
-            new ImageFromDockerfile().withFileFromPath(".", Path.of("docker")))
+            new ImageFromDockerfile().withFileFromPath(".", Path.of("docker", "postgres")))
             .withEnv("POSTGRES_DB", DATABASE_NAME)
             .withEnv("POSTGRES_USER", SUPERUSER)
             .withEnv("POSTGRES_PASSWORD", SUPERUSER_PASSWORD)

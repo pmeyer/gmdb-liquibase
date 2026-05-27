@@ -145,7 +145,7 @@
                                     </excludes>
                                 </resource>
                                 <resource>
-                                    <directory>docker</directory>
+                                    <directory>docker/postgres</directory>
                                     <targetPath>gmdb-liquibase/docker</targetPath>
                                     <excludes>
                                         <exclude>**/.DS_Store</exclude>

@@ -1,0 +1,9 @@
+.git
+.github
+.idea
+target
+!target/
+target/*
+!target/gmdb-liquibase-*.jar
+*.iml
+.DS_Store

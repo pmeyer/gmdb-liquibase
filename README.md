@@ -10,7 +10,7 @@ Targets a PostgreSQL database.
 Database development was done with a containerized version of PostgreSQL version 17+ that included extensions supporting 
 JSON schema.  
 
-This container image can be built using the [Dockerfile](docker/Dockerfile) in the `docker` directory.  The image built 
+This container image can be built using the [Dockerfile](docker/postgres/Dockerfile) in the `docker/postgres` directory.  The image built
 includes PostgreSQL and the prebuilt [pg_jsonschema](https://github.com/supabase/pg_jsonschema) extensions.  Additionally, 
 two initialization scripts are pulled into the image that:
  - Create the pg_jsonschema extension in the database
@@ -131,9 +131,42 @@ mvn spring-boot:run -Dspring-boot.run.profiles=migrate
 
 If not set, the application uses the default placeholder `changeme` which will likely cause quick failure!
 
+## Running the Application Container
+Release builds publish a Spring Boot application image to GitHub Container Registry:
+
+```sh
+docker pull ghcr.io/pmeyer/gmdb-liquibase:latest
+```
+
+The image defaults to the `migrate` Spring profile. Provide the same environment variables used by the Maven-based
+application run:
+
+```sh
+docker run --rm \
+  -e SPRING_PROFILES_ACTIVE=migrate \
+  -e GMDB_ADMIN_PASSWORD='password-for-gmdb-admin-user' \
+  -e PGSQL_HOST='my-gmdb-host' \
+  -e PGSQL_PORT=12345 \
+  ghcr.io/pmeyer/gmdb-liquibase:latest
+```
+
+For first-time database setup, run the same image with the `bootstrap` profile and the bootstrap environment variables:
+
+```sh
+docker run --rm \
+  -e SPRING_PROFILES_ACTIVE=bootstrap \
+  -e GMDB_SUPERUSER='the-pg-super-user' \
+  -e GMDB_SUPERUSER_PASSWORD='super-user-password' \
+  -e GMDB_ADMIN_PASSWORD='password-for-gmdb-admin-user' \
+  -e GMDB_APP_PASSWORD='password-for-gmdb-app-user' \
+  -e PGSQL_HOST='my-gmdb-host' \
+  -e PGSQL_PORT=12345 \
+  ghcr.io/pmeyer/gmdb-liquibase:latest
+```
+
 ## Integration Tests
 Integration tests use [Testcontainers](https://testcontainers.com/) to run PostgreSQL from the same
-[Dockerfile](docker/Dockerfile) used for local database development.
+[Dockerfile](docker/postgres/Dockerfile) used for local database development.
 
 The test container sets `POSTGRES_DB=gmdb`, along with a generated PostgreSQL superuser and password, so the database
 name and initialization behavior match the assumptions used by the Spring Boot + Liquibase profiles. The current
@@ -168,5 +201,10 @@ that release tag and publishes the non-snapshot Maven artifact to GitHub Package
 </dependency>
 ```
 
+The same release workflow also builds and publishes the application container image from
+[docker/app/Dockerfile](docker/app/Dockerfile) to GitHub Container Registry as `ghcr.io/pmeyer/gmdb-liquibase`.
+The image is assembled from the release jar produced by the Maven deploy step. Release images are tagged with the full
+version, the major/minor version, and `latest`.
+
 Snapshot versions may be built locally, but they are not published by the release workflow. The workflow verifies that
-the Maven project version does not end in `-SNAPSHOT` before running `mvn deploy`.
+the Maven project version does not end in `-SNAPSHOT` before publishing Maven artifacts or container images.
