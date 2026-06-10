@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.3.1](https://github.com/pmeyer/gmdb-liquibase/compare/gmdb-liquibase-v1.3.0...gmdb-liquibase-v1.3.1) (2026-06-10)
+
+
+### Bug Fixes
+
+* require liquibase credentials ([4dcef63](https://github.com/pmeyer/gmdb-liquibase/commit/4dcef637f1177c43fa1ae878058d2622a03db0a8))
+
+
+### Documentation
+
+* add copyright disclaimer and broader project summary ([5f23892](https://github.com/pmeyer/gmdb-liquibase/commit/5f23892c10e851977474b3910b33a3564264af71))
+* add license metadata to pom ([0acccd9](https://github.com/pmeyer/gmdb-liquibase/commit/0acccd93036a51cccdbe9d3c5d6e2836652ccb27))
+* add MIT license ([45222d0](https://github.com/pmeyer/gmdb-liquibase/commit/45222d02dbdef35e972248dea974e685c328adee))
+* correct release image tag documentation ([aff7726](https://github.com/pmeyer/gmdb-liquibase/commit/aff77269d6afab232f0cae94c47ba7c4e415215d))
+
 ## [1.3.0](https://github.com/pmeyer/gmdb-liquibase/compare/gmdb-liquibase-v1.2.0...gmdb-liquibase-v1.3.0) (2026-05-27)
 
 
