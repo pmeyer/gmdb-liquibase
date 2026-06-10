@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.2](https://github.com/pmeyer/gmdb-liquibase/compare/gmdb-liquibase-v1.3.1...gmdb-liquibase-v1.3.2) (2026-06-10)
+
+
+### Bug Fixes
+
+* update Spring Boot to 3.5.15 ([f256fb0](https://github.com/pmeyer/gmdb-liquibase/commit/f256fb05bf76fdc11d25a5cfe7e7a36bd0fd9a4f))
+
 ## [1.3.1](https://github.com/pmeyer/gmdb-liquibase/compare/gmdb-liquibase-v1.3.0...gmdb-liquibase-v1.3.1) (2026-06-10)
 
 
