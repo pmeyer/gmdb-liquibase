@@ -227,7 +227,7 @@ that release tag and publishes the non-snapshot Maven artifact to GitHub Package
 The same release workflow also builds and publishes the application container image from
 [docker/app/Dockerfile](docker/app/Dockerfile) to GitHub Container Registry as `ghcr.io/pmeyer/gmdb-liquibase`.
 The image is assembled from the release jar produced by the Maven deploy step. Release images are tagged with the full
-version, the major/minor version, and `latest`.
+release version and `latest`.
 
 The Postgres image from [docker/postgres/Dockerfile](docker/postgres/Dockerfile) is published separately as
 `ghcr.io/pmeyer/gmdb-postgres-jsonschema` when files under `docker/postgres` change on `main`, or when the workflow is
