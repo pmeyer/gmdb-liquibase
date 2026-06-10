@@ -4,11 +4,11 @@ spring:
       on-profile: bootstrap
 
   datasource:
-    username: ${GMDB_SUPERUSER:changeme}
-    password: ${GMDB_SUPERUSER_PASSWORD:changeme}
+    username: ${GMDB_SUPERUSER}
+    password: ${GMDB_SUPERUSER_PASSWORD}
 
   liquibase:
     change-log: classpath:db/changelog/bootstrap-changelog.xml
     parameters:
-      gmdb.app.password: ${GMDB_APP_PASSWORD:changeme}
-      gmdb.admin.password: ${GMDB_ADMIN_PASSWORD:changeme}
+      gmdb.app.password: ${GMDB_APP_PASSWORD}
+      gmdb.admin.password: ${GMDB_ADMIN_PASSWORD}

@@ -5,7 +5,7 @@ spring:
 
   datasource:
     username: gmdb_admin
-    password: ${GMDB_ADMIN_PASSWORD:changeme}
+    password: ${GMDB_ADMIN_PASSWORD}
 
   liquibase:
     change-log: classpath:db/changelog/db-changelog.xml

@@ -152,7 +152,7 @@ mvn spring-boot:run -Dspring-boot.run.profiles=migrate
 ```
 
 
-If not set, the application uses the default placeholder `changeme` which will likely cause quick failure!
+If any required environment variable is not set, the application fails during configuration placeholder resolution.
 
 ## Running the Application Container
 Release builds publish a Spring Boot application image to GitHub Container Registry:
