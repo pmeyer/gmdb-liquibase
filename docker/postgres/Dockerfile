@@ -1,7 +1,7 @@
-FROM postgres:17.1-bookworm
+FROM postgres:17.9-bookworm
 
-ARG PG_JSONSCHEMA_VERSION=0.3.3
-ARG PG_JSONSCHEMA_SHA256=0646aedccbf20b9a67e0c597dece7eb5b3d95d96c3b6c61f5394e3732a778881
+ARG PG_JSONSCHEMA_VERSION=0.3.4
+ARG PG_JSONSCHEMA_SHA256=4c339c178a7396b4076fb1eb5ffe3430bafd3d5f92fb6c917ad49860237db6c9
 
 # Install pg_jsonschema from the prebuilt .deb release
 RUN set -eux; \
