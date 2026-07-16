@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.0](https://github.com/pmeyer/gmdb-liquibase/compare/gmdb-liquibase-v1.3.2...gmdb-liquibase-v2.0.0) (2026-07-16)
+
+
+### ⚠ BREAKING CHANGES
+
+* upgrade to Spring Boot 4.1 and Java 25
+
+### Features
+
+* upgrade to Spring Boot 4.1 and Java 25 ([df1b8b3](https://github.com/pmeyer/gmdb-liquibase/commit/df1b8b30626b010c873b909b03e00dca56edb6b8))
+
 ## [1.3.2](https://github.com/pmeyer/gmdb-liquibase/compare/gmdb-liquibase-v1.3.1...gmdb-liquibase-v1.3.2) (2026-06-10)
 
 

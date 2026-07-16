@@ -57,7 +57,7 @@ Spring Boot jar:
 <dependency>
   <groupId>com.yellowmoonsoftware.gmcatalog</groupId>
   <artifactId>gmdb-liquibase</artifactId>
-  <version>1.3.3-SNAPSHOT</version> <!-- x-release-please-version -->
+  <version>2.0.0</version> <!-- x-release-please-version -->
   <classifier>resources</classifier>
   <scope>test</scope>
 </dependency>
@@ -226,7 +226,7 @@ that release tag and publishes the non-snapshot Maven artifact to GitHub Package
 <dependency>
   <groupId>com.yellowmoonsoftware.gmcatalog</groupId>
   <artifactId>gmdb-liquibase</artifactId>
-  <version>1.3.3-SNAPSHOT</version> <!-- x-release-please-version -->
+  <version>2.0.0</version> <!-- x-release-please-version -->
 </dependency>
 ```
 
