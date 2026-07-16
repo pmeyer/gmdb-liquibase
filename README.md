@@ -15,6 +15,12 @@ guitar tablature song transcriptions.
 
 Targets a PostgreSQL database.
 
+## Prerequisites
+
+- Java 25
+- Maven 3.6.3 or later
+- Docker for integration tests and container builds
+
 ## Copyright and Third-Party Materials
 
 This repository contains source code, database schema/migration logic, documentation, and development tooling for a 
